@@ -1,0 +1,63 @@
+<%- include('partials/top', { title: 'Izvietojums' }) %>
+
+<form method="post" action="/placements<%= form.id ? '/' + form.id : '' %>" class="card mb-6">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <h2 class="mb-4 text-xl font-semibold"><%= form.id ? 'Atjaunināt izvietojumu' : 'Reģistrēt izvietojumu' %></h2>
+  <%- include('partials/errors') %>
+
+  <div class="grid gap-4 md:grid-cols-4">
+    <label><span class="label">Prece</span>
+      <select class="input" name="product_id" required>
+        <option value="">Izvēlies…</option>
+        <% for (const p of products) { %>
+          <option value="<%= p.id %>" <%= p.id == form.product_id ? 'selected' : '' %>><%= p.sku %> – <%= p.name %></option>
+        <% } %>
+      </select></label>
+    <label><span class="label">Vieta</span>
+      <select class="input" name="location_id" required>
+        <option value="">Izvēlies…</option>
+        <% for (const l of locations) { %>
+          <option value="<%= l.id %>" <%= l.id == form.location_id ? 'selected' : '' %>><%= l.code %> (<%= l.zone %>)</option>
+        <% } %>
+      </select></label>
+    <label><span class="label">Daudzums</span>
+      <input class="input" type="number" name="quantity" value="<%= form.quantity %>" required min="0" step="1"></label>
+    <label><span class="label">Stāvoklis</span>
+      <select class="input" name="condition">
+        <% for (const c of conditions) { %>
+          <option <%= c === form.condition ? 'selected' : '' %>><%= c %></option>
+        <% } %>
+      </select></label>
+    <label class="md:col-span-4"><span class="label">Piezīme par izmaiņām</span>
+      <input class="input" name="note" value="<%= form.note %>" maxlength="200" placeholder="Piem., pārvietots no A-01-01, iepakojums bojāts"></label>
+  </div>
+
+  <div class="mt-4 flex gap-2">
+    <button class="btn"><%= form.id ? 'Saglabāt' : 'Reģistrēt' %></button>
+    <% if (form.id) { %><a href="/placements" class="btn-small self-center">Atcelt</a><% } %>
+  </div>
+</form>
+
+<div class="card overflow-x-auto">
+  <h2 class="mb-4 text-xl font-semibold">Kur atrodas preces</h2>
+  <table class="table">
+    <tr><th>Vieta</th><th>Prece</th><th>Daudz.</th><th>Stāvoklis</th><th>Piezīme</th><th>Pēdējās izmaiņas</th><th></th></tr>
+    <% for (const pl of placements) { %>
+      <tr>
+        <td class="font-medium"><%= pl.code %></td>
+        <td><%= pl.sku %> – <%= pl.product_name %></td>
+        <td><%= pl.quantity %></td>
+        <td class="<%= pl.condition === 'Labs' ? '' : 'font-semibold text-red-700' %>"><%= pl.condition %></td>
+        <td><%= pl.note %></td>
+        <td class="text-xs"><%= pl.updated_by %><br><%= pl.updated_at %></td>
+        <td class="whitespace-nowrap text-right">
+          <a href="/placements?edit=<%= pl.id %>" class="btn-small">Atjaunināt</a>
+          <form method="post" action="/placements/<%= pl.id %>/delete" class="inline" data-confirm="Izņemt preci no vietas <%= pl.code %>?">
+            <input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn-delete">Izņemt</button>
+          </form>
+        </td>
+      </tr>
+    <% } %>
+  </table>
+</div>
+<%- include('partials/bottom') %>

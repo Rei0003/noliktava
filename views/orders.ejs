@@ -1,0 +1,56 @@
+<%- include('partials/top', { title: 'Pasūtījumi' }) %>
+
+<form method="post" action="/orders" class="card mb-6">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <h2 class="mb-4 text-xl font-semibold">Jauns pasūtījums</h2>
+  <%- include('partials/errors') %>
+
+  <div class="grid gap-4 md:grid-cols-4">
+    <label class="md:col-span-2"><span class="label">Klients</span>
+      <input class="input" name="customer" value="<%= form.customer %>" required minlength="2" maxlength="100"></label>
+    <label><span class="label">Prece</span>
+      <select class="input" name="product_id" required>
+        <option value="">Izvēlies…</option>
+        <% for (const p of products) { %>
+          <option value="<%= p.id %>" <%= p.id == form.product_id ? 'selected' : '' %>><%= p.name %> (ir <%= p.quantity %>)</option>
+        <% } %>
+      </select></label>
+    <label><span class="label">Daudzums</span>
+      <input class="input" type="number" name="quantity" value="<%= form.quantity %>" required min="1" step="1"></label>
+  </div>
+  <button class="btn mt-4">Izveidot</button>
+</form>
+
+<div class="card overflow-x-auto">
+  <h2 class="mb-1 text-xl font-semibold">Pasūtījumi</h2>
+  <p class="mb-4 text-sm">Process: Jauns → Apstrādē → Nosūtīts → Piegādāts. Nosūtot preces tiek norakstītas no atlikuma.</p>
+  <table class="table">
+    <tr><th>Nr.</th><th>Klients</th><th>Prece</th><th>Daudz.</th><th>Statuss</th><th>Izveidoja</th><th></th></tr>
+    <% for (const o of orders) { %>
+      <tr>
+        <td><%= o.id %></td>
+        <td><%= o.customer %></td>
+        <td><%= o.product_name %></td>
+        <td><%= o.quantity %></td>
+        <td class="font-medium"><%= o.status %></td>
+        <td class="text-xs"><%= o.created_by %><br><%= o.created_at %></td>
+        <td class="whitespace-nowrap text-right">
+          <% for (const next of NEXT_STATUS[o.status]) { %>
+            <form method="post" action="/orders/<%= o.id %>/status" class="inline"
+                  <% if (next === 'Atcelts') { %>data-confirm="Atcelt pasūtījumu #<%= o.id %>?"<% } %>>
+              <input type="hidden" name="_csrf" value="<%= csrf %>">
+              <input type="hidden" name="status" value="<%= next %>">
+              <button class="<%= next === 'Atcelts' ? 'btn-delete' : 'btn-small' %>">→ <%= next %></button>
+            </form>
+          <% } %>
+          <% if (o.status === 'Jauns' || o.status === 'Atcelts') { %>
+            <form method="post" action="/orders/<%= o.id %>/delete" class="inline" data-confirm="Dzēst pasūtījumu #<%= o.id %>?">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn-delete">Dzēst</button>
+            </form>
+          <% } %>
+        </td>
+      </tr>
+    <% } %>
+  </table>
+</div>
+<%- include('partials/bottom') %>

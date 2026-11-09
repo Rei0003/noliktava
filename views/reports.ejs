@@ -1,0 +1,57 @@
+<%- include('partials/top', { title: 'Pārskati' }) %>
+
+<div class="card mb-6 flex flex-wrap items-center justify-between gap-4">
+  <h1 class="text-2xl font-semibold">Pārskati</h1>
+  <a href="/reports/export" class="btn">Lejupielādēt CSV (Excel)</a>
+</div>
+
+<% if (report.totals) { %>
+  <div class="card mb-6">
+    <h2 class="mb-4 text-xl font-semibold">Noliktavas darbība</h2>
+    <div class="mb-6 grid gap-4 md:grid-cols-3">
+      <div><p class="text-sm">Preču veidi</p><p class="text-2xl font-semibold"><%= report.totals.products %></p></div>
+      <div><p class="text-sm">Vienības kopā</p><p class="text-2xl font-semibold"><%= report.totals.units %></p></div>
+      <div><p class="text-sm">Krājumu vērtība</p><p class="text-2xl font-semibold"><%= report.totals.value.toFixed(2) %> €</p></div>
+    </div>
+
+    <h3 class="mb-2 font-semibold">Pasūtījumi pa statusiem</h3>
+    <table class="table mb-6">
+      <tr><th>Statuss</th><th>Skaits</th></tr>
+      <% for (const s of report.ordersByStatus) { %><tr><td><%= s.status %></td><td><%= s.count %></td></tr><% } %>
+    </table>
+
+    <h3 class="mb-2 font-semibold">Zems atlikums (jāpasūta)</h3>
+    <table class="table">
+      <tr><th>Artikuls</th><th>Prece</th><th>Atlikums</th><th>Minimums</th></tr>
+      <% for (const p of report.lowStock) { %>
+        <tr><td><%= p.sku %></td><td><%= p.name %></td><td class="text-red-700"><%= p.quantity %></td><td><%= p.min_quantity %></td></tr>
+      <% } %>
+      <% if (!report.lowStock.length) { %><tr><td colspan="4">Visām precēm atlikums ir pietiekams.</td></tr><% } %>
+    </table>
+  </div>
+<% } %>
+
+<% if (report.placements) { %>
+  <div class="card">
+    <h2 class="mb-4 text-xl font-semibold">Preču izvietojums un stāvoklis</h2>
+    <table class="table mb-6">
+      <tr><th>Vieta</th><th>Zona</th><th>Prece</th><th>Daudz.</th><th>Stāvoklis</th><th>Piezīme</th></tr>
+      <% for (const p of report.placements) { %>
+        <tr>
+          <td class="font-medium"><%= p.code %></td><td><%= p.zone %></td><td><%= p.sku %> – <%= p.name %></td><td><%= p.quantity %></td>
+          <td class="<%= p.condition === 'Labs' ? '' : 'font-semibold text-red-700' %>"><%= p.condition %></td><td><%= p.note %></td>
+        </tr>
+      <% } %>
+    </table>
+
+    <h3 class="mb-2 font-semibold">Atlikums nesakrīt ar izvietoto daudzumu</h3>
+    <table class="table">
+      <tr><th>Artikuls</th><th>Prece</th><th>Pēc uzskaites</th><th>Izvietots</th></tr>
+      <% for (const p of report.notPlaced) { %>
+        <tr><td><%= p.sku %></td><td><%= p.name %></td><td><%= p.quantity %></td><td><%= p.placed %></td></tr>
+      <% } %>
+      <% if (!report.notPlaced.length) { %><tr><td colspan="4">Viss sakrīt.</td></tr><% } %>
+    </table>
+  </div>
+<% } %>
+<%- include('partials/bottom') %>

@@ -1,0 +1,56 @@
+<%- include('partials/top', { title: 'Lietotāji' }) %>
+<% const roleNames = { admin: 'Administrators', darbinieks: 'Noliktavas darbinieks', kartotajs: 'Plauktu kārtotājs' }; %>
+
+<form method="post" action="/users<%= form.id ? '/' + form.id : '' %>" class="card mb-6">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <h2 class="mb-4 text-xl font-semibold"><%= form.id ? 'Rediģēt lietotāju' : 'Jauns lietotājs' %></h2>
+  <%- include('partials/errors') %>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <label><span class="label">Lietotājvārds</span>
+      <input class="input" name="username" value="<%= form.username %>" required minlength="3" maxlength="30"
+             pattern="[a-zA-Z0-9._\-]+" title="Latīņu burti, cipari, punkts, _ un -" autocomplete="off"></label>
+    <label><span class="label">Vārds, uzvārds</span>
+      <input class="input" name="full_name" value="<%= form.full_name %>" required minlength="2" maxlength="80"></label>
+    <label><span class="label">Loma</span>
+      <select class="input" name="role">
+        <% for (const r of roles) { %>
+          <option value="<%= r %>" <%= r === form.role ? 'selected' : '' %>><%= roleNames[r] %></option>
+        <% } %>
+      </select></label>
+    <label><span class="label"><%= form.id ? 'Jauna parole (atstāj tukšu, lai nemainītu)' : 'Parole (min. 8 simboli, burts un cipars)' %></span>
+      <input class="input" type="password" name="password" <%= form.id ? '' : 'required' %> minlength="8" maxlength="72" autocomplete="new-password"></label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" name="is_active" value="1" <%= form.is_active ? 'checked' : '' %>> Konts aktīvs (var pieslēgties)
+    </label>
+  </div>
+
+  <div class="mt-4 flex gap-2">
+    <button class="btn"><%= form.id ? 'Saglabāt' : 'Izveidot' %></button>
+    <% if (form.id) { %><a href="/users" class="btn-small self-center">Atcelt</a><% } %>
+  </div>
+</form>
+
+<div class="card overflow-x-auto">
+  <h2 class="mb-4 text-xl font-semibold">Lietotāji</h2>
+  <table class="table">
+    <tr><th>Lietotājvārds</th><th>Vārds, uzvārds</th><th>Loma</th><th>Statuss</th><th></th></tr>
+    <% for (const u of users) { %>
+      <tr>
+        <td class="font-medium"><%= u.username %></td>
+        <td><%= u.full_name %></td>
+        <td><%= roleNames[u.role] %></td>
+        <td><%= u.is_active ? 'Aktīvs' : 'Bloķēts' %></td>
+        <td class="whitespace-nowrap text-right">
+          <a href="/users?edit=<%= u.id %>" class="btn-small">Rediģēt</a>
+          <% if (u.id !== user.id) { %>
+            <form method="post" action="/users/<%= u.id %>/delete" class="inline" data-confirm="Dzēst lietotāju <%= u.username %>?">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn-delete">Dzēst</button>
+            </form>
+          <% } %>
+        </td>
+      </tr>
+    <% } %>
+  </table>
+</div>
+<%- include('partials/bottom') %>

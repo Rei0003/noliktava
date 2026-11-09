@@ -1,0 +1,5 @@
+<% if (errors.length) { %>
+  <ul class="mb-4 list-disc bg-red-100 py-3 pr-4 pl-8 text-red-800">
+    <% for (const e of errors) { %><li><%= e %></li><% } %>
+  </ul>
+<% } %>

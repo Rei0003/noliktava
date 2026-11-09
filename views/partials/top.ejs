@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> – Noliktava</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="min-h-screen bg-brand text-black">
+<% if (user) {
+  const all = ['admin', 'darbinieks', 'kartotajs'];
+  const links = [
+    ['/', 'Sākums', all],
+    ['/products', 'Preces', all],
+    ['/orders', 'Pasūtījumi', ['admin', 'darbinieks']],
+    ['/placements', 'Izvietojums', ['admin', 'kartotajs']],
+    ['/locations', 'Vietas', ['admin']],
+    ['/reports', 'Pārskati', all],
+    ['/users', 'Lietotāji', ['admin']],
+  ];
+  const roleNames = { admin: 'Administrators', darbinieks: 'Noliktavas darbinieks', kartotajs: 'Plauktu kārtotājs' };
+%>
+  <header class="bg-card">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-1 gap-y-2 px-4 py-3">
+      <span class="mr-4 text-lg font-semibold">Noliktava</span>
+      <% for (const [href, label, roles] of links) { if (!roles.includes(user.role)) continue; %>
+        <a href="<%= href %>" class="rounded-md px-3 py-1.5 <%= path === href ? 'bg-brand' : 'hover:bg-field' %>"><%= label %></a>
+      <% } %>
+      <form method="post" action="/logout" class="ml-auto flex items-center gap-3">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <span class="text-sm"><%= user.full_name %> (<%= roleNames[user.role] %>)</span>
+        <button class="btn-small">Iziet</button>
+      </form>
+    </div>
+  </header>
+<% } %>
+<main class="mx-auto max-w-5xl px-4 py-8">
+<% if (message) { %>
+  <p class="mb-4 bg-card px-4 py-3 font-medium"><%= message %></p>
+<% } %>

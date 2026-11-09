@@ -1,0 +1,19 @@
+<%- include('partials/top', { title: 'Sākums' }) %>
+<div class="card mb-6">
+  <h1 class="text-2xl font-semibold">Sveiks, <%= user.full_name %>!</h1>
+  <% if (user.role === 'admin') { %>
+    <p>Tu vari pārvaldīt lietotājus, preces, vietas un pasūtījumus, kā arī skatīt visus pārskatus.</p>
+  <% } else if (user.role === 'darbinieks') { %>
+    <p>Tu vari pievienot un rediģēt preces, veidot pasūtījumus, mainīt to statusus un skatīt noliktavas pārskatus.</p>
+  <% } else { %>
+    <p>Tu vari apskatīt preces, reģistrēt to izvietojumu un stāvokli, kā arī skatīt izvietojuma pārskatus.</p>
+  <% } %>
+</div>
+
+<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+  <div class="card"><p class="text-sm">Preces</p><p class="text-3xl font-semibold"><%= stats.products %></p></div>
+  <div class="card"><p class="text-sm">Zems atlikums</p><p class="text-3xl font-semibold"><%= stats.lowStock %></p></div>
+  <div class="card"><p class="text-sm">Atvērti pasūtījumi</p><p class="text-3xl font-semibold"><%= stats.openOrders %></p></div>
+  <div class="card"><p class="text-sm">Bojātas / jāpārbauda</p><p class="text-3xl font-semibold"><%= stats.problems %></p></div>
+</div>
+<%- include('partials/bottom') %>

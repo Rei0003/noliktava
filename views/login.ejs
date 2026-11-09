@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pieslēgties – Noliktava</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="flex min-h-screen items-center justify-center bg-brand p-4">
+  <form method="post" action="/login" class="w-full max-w-sm bg-card px-8 py-10">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+
+    <% if (error) { %>
+      <p class="mb-4 bg-red-100 px-3 py-2 text-sm text-red-800"><%= error %></p>
+    <% } %>
+
+    <input class="input mb-8 h-13" name="username" value="<%= username %>" placeholder="Lietotājvārds"
+           aria-label="Lietotājvārds" required maxlength="30" autocomplete="username">
+    <input class="input mb-6 h-13" type="password" name="password" placeholder="Parole"
+           aria-label="Parole" required maxlength="72" autocomplete="current-password">
+    <button class="btn h-13 w-full text-xl">Pieslēgties</button>
+  </form>
+</body>
+</html>

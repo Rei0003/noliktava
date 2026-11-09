@@ -1,0 +1,40 @@
+<%- include('partials/top', { title: 'Vietas' }) %>
+
+<form method="post" action="/locations<%= form.id ? '/' + form.id : '' %>" class="card mb-6">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <h2 class="mb-4 text-xl font-semibold"><%= form.id ? 'Rediģēt vietu' : 'Pievienot vietu' %></h2>
+  <%- include('partials/errors') %>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <label><span class="label">Kods (piem., A-01-03)</span>
+      <input class="input" name="code" value="<%= form.code %>" required minlength="2" maxlength="20" pattern="[A-Za-z0-9\-]+" title="Latīņu burti, cipari un -"></label>
+    <label><span class="label">Zona</span>
+      <input class="input" name="zone" value="<%= form.zone %>" required maxlength="40"></label>
+  </div>
+
+  <div class="mt-4 flex gap-2">
+    <button class="btn"><%= form.id ? 'Saglabāt' : 'Pievienot' %></button>
+    <% if (form.id) { %><a href="/locations" class="btn-small self-center">Atcelt</a><% } %>
+  </div>
+</form>
+
+<div class="card overflow-x-auto">
+  <h2 class="mb-4 text-xl font-semibold">Noliktavas vietas</h2>
+  <table class="table">
+    <tr><th>Kods</th><th>Zona</th><th>Preču ieraksti</th><th></th></tr>
+    <% for (const l of locations) { %>
+      <tr>
+        <td class="font-medium"><%= l.code %></td>
+        <td><%= l.zone %></td>
+        <td><%= l.items %></td>
+        <td class="whitespace-nowrap text-right">
+          <a href="/locations?edit=<%= l.id %>" class="btn-small">Rediģēt</a>
+          <form method="post" action="/locations/<%= l.id %>/delete" class="inline" data-confirm="Dzēst vietu <%= l.code %>?">
+            <input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn-delete">Dzēst</button>
+          </form>
+        </td>
+      </tr>
+    <% } %>
+  </table>
+</div>
+<%- include('partials/bottom') %>
